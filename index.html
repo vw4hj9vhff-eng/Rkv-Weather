@@ -1,8 +1,116 @@
-<div id="ww_83c908ede60db" v='1.3' loc='id' a='{"t":"responsive","lang":"en","sl_lpl":1,"ids":["wl983"],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"rgba(69,90,100,0)","cl_font":"#000000","cl_cloud":"#000000","cl_persp":"#000000","cl_sun":"#000000","cl_moon":"#000000","cl_thund":"#000000","el_nme":3,"sl_tof":"3","cl_odd":"#0000000a","el_wfc":3}'><a href="https://weatherwidget.org/" id="ww_83c908ede60db_u" target="_blank">Weather widget html</a></div><script async src="https://app3.weatherwidget.org/js/?id=ww_83c908ede60db"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weather Widget</title>
 
-<script>
-  setInterval(function () {
-    const iframe = document.getElementById("weather-frame");
-    iframe.src = iframe.src; // reload iframe
-  }, 3600000);
-</script>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #weather-scale-wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #weather-base {
+      width: 260px;
+      height: 88px;
+      transform-origin: center center;
+      transition: opacity 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="weather-scale-wrapper">
+    <div id="weather-base">
+      <div
+        id="ww_83c908ede60db"
+        v="1.3"
+        loc="id"
+        a='{"t":"responsive","lang":"en","sl_lpl":1,"ids":["wl983"],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"rgba(69,90,100,0)","cl_font":"#000000","cl_cloud":"#000000","cl_persp":"#000000","cl_sun":"#000000","cl_moon":"#000000","cl_thund":"#000000","el_nme":3,"sl_tof":"3","cl_odd":"#0000000a","el_wfc":3}'>
+        <a href="https://weatherwidget.org/" target="_blank">
+          Weather widget html
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script async src="https://app3.weatherwidget.org/js/?id=ww_83c908ede60db"></script>
+
+  <script>
+    /* ---------- Scaling ---------- */
+    function scaleWeather() {
+      const baseW = 260;
+      const baseH = 88;
+
+      const scale = Math.min(
+        window.innerWidth / baseW,
+        window.innerHeight / baseH
+      );
+
+      document.getElementById("weather-base").style.transform =
+        `scale(${scale})`;
+    }
+
+    window.addEventListener("resize", scaleWeather);
+    scaleWeather();
+
+    /* ---------- Refresh widget ---------- */
+    function refreshWeatherWidget() {
+      const base = document.getElementById("weather-base");
+      const old = document.getElementById("ww_83c908ede60db");
+      if (!old) return;
+
+      base.style.opacity = 0;
+
+      setTimeout(() => {
+        old.remove();
+
+        const fresh = document.createElement("div");
+        fresh.id = "ww_83c908ede60db";
+        fresh.setAttribute("v", "1.3");
+        fresh.setAttribute("loc", "id");
+        fresh.setAttribute(
+          "a",
+          '{"t":"responsive","lang":"en","sl_lpl":1,"ids":["wl983"],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"rgba(69,90,100,0)","cl_font":"#000000","cl_cloud":"#000000","cl_persp":"#000000","cl_sun":"#000000","cl_moon":"#000000","cl_thund":"#000000","el_nme":3,"sl_tof":"3","cl_odd":"#0000000a","el_wfc":3}'
+        );
+
+        base.appendChild(fresh);
+
+        const script = document.createElement("script");
+        script.src = "https://app3.weatherwidget.org/js/?id=ww_83c908ede60db";
+        script.async = true;
+        document.body.appendChild(script);
+
+        base.style.opacity = 1;
+      }, 300);
+    }
+
+    /* ---------- Schedule refresh on the hour ---------- */
+    function scheduleHourlyRefresh() {
+      const now = new Date();
+      const msToNextHour =
+        (60 - now.getMinutes()) * 60 * 1000 -
+        now.getSeconds() * 1000 -
+        now.getMilliseconds();
+
+      setTimeout(() => {
+        refreshWeatherWidget();
+        setInterval(refreshWeatherWidget, 60 * 60 * 1000);
+      }, msToNextHour);
+    }
+
+    scheduleHourlyRefresh();
+  </script>
+
+</body>
+</html>
